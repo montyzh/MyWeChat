@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/app.css">
+		<style>
+			
+			.background {
+				height: 300px;
+				position: relative;
+			}
+			
+			#logoinfo {
+				position: absolute;
+				margin-top: -50px;
+				margin-left: 10px;
+				z-index: 999;
+			}
+			
+			#portrait {
+				height: 60px;
+				width: 60px;
+				border: 2px solid white;
+				margin-left: 60px;
+			}
+			
+			#nickname {
+				color: white;
+				font-size: 25px;
+				line-height: 60px;
+				float: left;
+			}
+			
+			#portraitImg {
+				width: 56px;
+				height: 56px;
+				z-index: 9999;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">朋友圈</h1>
+			<a class="mui-icon mui-icon-left-nav mui-pull-left" href="javascript:backMainPage()"></a>
+			<a class="mui-icon  mui-icon-camera  mui-pull-right" href="javascript:sendScircle()"></a>
+		</header>
+
+		<!--列表信息流 开始-->
+		<div id="pullrefresh" class="mui-scroll-wrapper mui-content">
+			<div class="mui-scroll">
+				<ul id="list" class="mui-table-view mui-table-view-chevron">
+					<!--背景-->
+					<div>
+						<img id="background" src="../../img/back.png" class="background" />
+
+					</div>
+
+					<div id="logoinfo">
+						<!--昵称-->
+						<div id="nickname">
+							Admin
+						</div>
+						<!--头像-->
+						<div id="portrait" style="">
+							<img id="portraitImg" src="../../img/por.JPG" />
+						</div>
+					</div>
+
+
+
+					<li>
+						<!-- 好友头像-->
+						<div class="po-avt-wrap">
+							<img id="friendPor" class="po-avt data-avt" src="../../img/por.JPG">
+						</div>
+						<div class="po-cmt">
+							<div class="po-hd">
+								<!-- 好友昵称-->
+								<p class="po-name"><span id="FriendName" class="data-name">Admin</span></p>
+								<div class="post">
+									<!-- 朋友圈内容-->
+									<p>这条消息永远置顶！～</p>
+									<!-- 朋友圈照片-->
+									<p id="friendImg">
+										
+										<img class="list-img" src="../../img/back.png" style="height: 80px;">
+										<img class="list-img" src="../../img/1F5A900BA65473EFA4106242EF5EED9B.png" style="height: 80px;">
+										<img class="list-img data-avt" src="../../img/68A28FA34050F5BD4C9E89A6DECB45AE.png" style="height: 80px;">
+									</p>
+								</div>
+								<!-- 
+                                	定位
+                                -->
+								<img style="" class="positionImg" src="../../img/geo.png"><p class="positionText">美国</p>
+								<!-- 发表时间-->
+								<p id="time" class="time">刚刚</p> <img class="c-icon" src="../../img/c.png">
+																  <img class="c-icon-z" style="margin-top: 0px; margin-right: 8px;"  src="../../img/zan.png"> 
+							</div>
+<!-- 上三角-->
+							<div class="r"></div>
+							<div class="cmt-wrap">
+								<!-- 点赞人-->
+								<div id="like" class="like"><img src="../../images/l.png">马鹏飞，郑家友...</div>
+								<!-- 回复区-->
+								<div id="reply" class="cmt-list">
+									<p><span>马鹏飞：</span>求求你别秀了！</p>	
+									<p><span>郑家友：</span>大吉大利！</p>
+									<p>
+										<span class="data-name">情久</span> 回复
+										<span>马鹏飞</span>
+										<span>：</span>不要！
+									</p>
+								</div>
+							</div>
+							</div>							
+							</li>
+
+				</ul>
+			</div>
+		</div>
+		<!--列表信息流 结束-->
+	</body>
+
+	<script src="../../js/mui.min.js"></script>
+	<script src="../../js/jquery-1.10.2.min.js"></script>
+	<script src="../../js/myapp.js"></script>
+	<script type="text/javascript" charset="utf-8">
+	
+	
+		mui.init({
+			swipeBack: true,
+			pullRefresh: {
+				container: '#pullrefresh',
+				down: {
+						contentrefresh: '正在加载...',
+						
+						callback: downrefresh
+					
+				},
+				up: {
+
+					
+				}
+			}
+		});
+
+		mui.plusReady(function() {
+			
+			setImg();
+			setScrollValue();
+			loadCircleInfo();
+			
+			
+	  		//alert(TotalCircle);
+		});
+		//存储朋友圈的所有信息
+		window.CircleInfoList = new Array();
+		//判断获取朋友圈信息的Ajax请求是否全部完成
+		window.ajaxIsEnd = 0;
+
+
+		function downrefresh(){
+			//重新从服务器端加载页面
+			//有重新清空页面的效果
+			//也可以自己实现清空函数
+			location.reload([true]);
+			loadCircleInfo();
+			mui('#pullrefresh').pullRefresh().endPulldownToRefresh(); //refresh completed
+
+			
+		}
+
+
+		function loadCircleInfo(){
+			//得到当前登陆的用户
+	  		var curUser = getCurUser();
+	  		ajax('getMyFriends', {userId:curUser.id}, {
+	  			success : function(data){
+	  				
+	  				var friends = data.result; 
+	  				
+	  				
+	  				 
+	  				setCurFiriends(friends);
+					
+					
+	  				//得到用户的朋友们
+	  				//获取朋友们的朋友圈
+	  				
+	  				buildCircleInfo(friends);
+	  				
+	  				
+	  				
+	  			}
+	  		});		
+		}
+		
+		
+		function buildCircleInfo(friends){
+			
+			
+			
+			var len = friends.length;
+			
+			
+			
+			//分别得到每个朋友的所有朋友圈信息
+	  		for (var i = 0; i < len; i++) {
+				 getOneCircle(friends[i],i);	
+			}
+	  		//以及加载我自己的朋友圈
+	  		var me = getCurUser();
+	  		getOneCircle(me);
+	  		//保存排序好的朋友圈
+	  		window.CircleInfoList = sort2Time(window.CircleInfoList);
+	  		
+			var friend = getCurFiriends();
+			friend.push(me);
+			addCircle2Web(window.CircleInfoList,friend);
+			
+			
+		}
+		
+		
+		
+		
+		
+		//按id加载朋友圈信息
+		
+		
+  	var templete ='<div class="po-avt-wrap"><img class="po-avt data-avt" data-field="portrait"  src="../../img/por.JPG"></div><div class="po-cmt"><div class="po-hd"><p class="po-name"><span data-field="nickname" class="data-name">情久</span></p><div class="post"><p data-field="text"></p><p data-field="image"></p></div><p data-field="circleId" ></p><img style="" class="positionImg" src="../../img/geo.png"><p data-field="position" class="positionText"></p><p data-field="time" class="time">刚刚</p><img class="c-icon" data-field="reply" src="../../img/c.png"><img class="c-icon-z" data-field="zan" style="margin-top: 0px; margin-right: 8px;"  src="../../img/zan.png"><div class="r"></div><div class="cmt-wrap"><div  class="like" data-field="likeperson"><img src="../../images/l.png"><p class="likeperson"></p></div> <div class="cmt-list" data-field="reply-com"></div>  </div> </div>';
+		
+		function getOneCircle(userInfo,j){
+				
+				//使用同步请求 
+				//我们这里设置的是先获取到所有信息再加载页面
+		  		ajaxT('getCircleInfo', {userId:userInfo.id}, {
+	  			success : function(data){
+	  				
+	  				var OnePersonCircles =  data.result; 
+	  				//存储信息
+	  				saveCircleInfoToLocal(OnePersonCircles);
+
+	  				var Friends = getCurFiriends();
+
+//	
+//					
+					
+	  			}
+	  			
+	  		});	
+	  			 		
+		}		
+			
+	//构建页面
+	//将朋友圈信息动态添加
+	function addCircle2Web(info,friend){
+		/****************国际标准分割线******************************/
+		for(var x = 0; x<info.length;x++){
+			var index = 0;
+			//先把每条信息和对应的用户联系起来
+			//朋友圈表是没有存储用户头像的，所以要查找对应用户
+			for(var i = 0;i<friend.length;i++){
+				if(info[x].userId == friend[i].id){
+					index = i;
+					break;
+				}	
+			}
+			
+			
+			
+	  	var li = jQuery("<li>");
+	  	
+  		li.html(templete);
+  		li.find("[data-field]").each(function(i, ele){
+  			
+  			var $ele = jQuery(ele);
+  			var dataField = $ele.attr("data-field");
+  			switch (dataField){
+  				case 'portrait':
+
+  					$ele.attr("src", toServerUrl( friend[index].portrait ) );
+  					
+  					break;
+  				case 'nickname':
+  					$ele.text(friend[index].nickName);
+  					
+  					break;
+  				case 'text':
+  					$ele.text(info[x].text); 
+  					break;
+  				case 'image':
+  				//没有图片就隐藏框框
+  				var arrayImg = info[x].image.split(";");
+  					if(info[x].image == ""){
+  						
+  					}
+  					else if(arrayImg.length == 1){
+  								var img = document.createElement("img");
+ 								img.className = "list-img";
+ 								console.log(toServerUrl(arrayImg[0]) );
+ 								img.src = toServerUrl(arrayImg[0]);
+ 								$ele.append(img); 						
+  					}
+  					else{
+  						//多张图片
+  						
+  						for(var i = 0; i<arrayImg.length-1;i++){
+ 								var img = document.createElement("img");
+ 								img.className = "list-img";
+ 								//console.log(toServerUrl(arrayImg[i]) );
+ 								img.src = toServerUrl(arrayImg[i]);
+ 								$ele.append(img);
+  						}
+  						
+  					}
+  					
+
+  					
+  					break;
+
+  				case 'circleId':
+  				//存储每一条朋友圈的id
+  				
+  		  				$ele.hide();
+  		  				$ele.text(info[x].id);
+				
+	  				break;	
+  					
+  				case 'time':
+  					
+  					$ele.text(info[x].time); 
+  					break;
+  				case 'zan':
+  		  				$ele.bind('tap',function(){
+  		  					//获得本条朋友圈id
+  		  					var circleid = $ele.prev().prev().prev().prev().prev().text();
+  		  					
+  		  					//得到当前点赞人
+  		  			
+  		  					var user = getCurUser();
+  		  					//
+  		  					$ele.next().show();
+  		  					$ele.next().next().children('.like').show(); 		  					
+		  					//点赞执行函数
+		  					var temp = $ele.next().next().children().children('.likeperson').text();
+		  					
+		  				
+	
+		  						$ele.next().next().children().children('.likeperson').append(user.nickName + ",");	
+					  		//获得点赞人
+					  		var likeperson = $ele.next().next().children().children('.likeperson').text();
+					  		
+					  		ajax('updateLikePerson', {circleId: circleid,likePerson: likeperson}, {
+				  			success : function(data){
+											//成功
+										
+									}
+									
+								});	
+
+		  				});
+						
+
+	  				
+	  				break;
+  				case 'likeperson':
+  				//读取点赞的人
+  						var likeTemp = info[x].like;
+  						$ele.children('.likeperson').text(likeTemp);
+	  					if(likeTemp == null){
+	  						$ele.parent().prev().hide();
+	  						$ele.hide();
+	  					}
+	  				break;
+	  			case 'reply':
+  				//绑定事件
+				$ele.bind('tap',function(){
+					var circleid = $ele.prev().prev().prev().prev().text();
+					var user = getCurUser();
+					
+					var btnArry = ['取消','确定'];
+					//得到发朋友圈的人昵称
+				
+					mui.prompt(' ','请输入评论','评论',btnArry,function(e){
+						//确定按钮
+						if(e.index == 1){
+							//创建评论
+							var p = document.createElement("p");
+   							var span = document.createElement("span");
+   							p.innerText = e.value;
+   							span.innerText = user.nickName + ":";
+   							p.append(span);  							
+   							$ele.next().next().next().children('.cmt-list').append(p);
+   							
+						//保存数据库
+							ajax('insertRely', {circleId: circleid,content: e.value,nick: user.nickName}, {
+				  			success : function(data){
+											//成功
+										
+									}
+									
+								});
+							
+							
+						}
+						//取消
+						else{
+							
+						}
+					});
+					
+				
+				});
+	  				break;
+	  			
+	  			case 'reply-com':
+	  			
+	  				
+					ajax('getRely', {circleId: info[x].id}, {
+		  			success : function(data){
+									var relys = data.result;
+									
+									if(data.code == 0){
+									//动态添加
+										for(var i = 0;i<relys.length;i++){
+											var p = document.createElement("p");
+				   							var span = document.createElement("span");
+				   							p.innerText = relys[i].content;
+				   							span.innerText = relys[i].nick + ":";
+				   							p.append(span);  							
+				   							$ele.append(p);	
+										}		
+									}
+									else{
+										
+									}
+									
+									
+									
+
+							}
+							
+						}); 					
+  					
+  				
+	  				break;
+	  			
+  				case 'position':
+  				//如果用户没有添加坐标，就不显示图标
+  					if(info[x].position == "null"){
+  						var pre = $ele.prev();
+  						pre.hide();
+  					}else {
+  						$ele.text(info[x].position);
+  						
+  					}
+	  				break;	  				
+  				default:
+  					
+  					//$ele.text(userInfo[dataField]);
+  					
+  					break;
+  			}
+  		
+  		});
+  		
+  		jQuery("#list").append(li);		
+		
+		
+		}
+		
+
+		/****************国际标准分割线******************************/		
+		
+	}
+		
+	
+	//将ajax请求的朋友圈信息存储起来
+	function saveCircleInfoToLocal(data){
+		
+		for(var i = 0;i<data.length;i++){
+			window.CircleInfoList.push(data[i]);
+			
+		}
+		
+		
+		
+	}
+	/****************国际标准分割线******************************/
+	//时间处理
+	//按时间排序朋友圈
+	function sort2Time(circleinfolist){
+    	var tempExchangVal;	
+	    for(var i = 0;i<circleinfolist.length;i++){
+	        for (var j = 0; j < circleinfolist.length - 1 - i; j++) {
+	            if (circleinfolist[j].time < circleinfolist[j + 1].time) {
+	            	
+	                tempExchangVal = circleinfolist[j];
+	                circleinfolist[j] = circleinfolist[j +1];
+	                circleinfolist[j + 1]= tempExchangVal;
+	            }
+	        }
+	        
+	    }
+	    return circleinfolist;
+	}
+	
+
+	
+	/****************国际标准分割线******************************/
+
+
+	//点赞和回复功能
+	/****************国际标准分割线******************************/
+		
+		
+	
+	
+	/****************国际标准分割线******************************/
+
+		//左上角返回发现页面
+		function backMainPage() {
+			//显示发现页
+
+			plus.webview.show("index.html");
+
+			//有的系统自带有延时显示页面
+			//隐藏当前页面时先等显示完成后再隐藏
+			setTimeout(
+				"plus.webview.hide('friendship.html')",
+				300
+			);
+
+		}
+
+		//发朋友圈
+		function sendScircle(){
+			//创建页面
+  			plus.webview.create("/find/friendloop/feedback.html","feedback.html");
+			//显示朋友圈页面
+			plus.webview.show("feedback.html");
+			//隐藏其它的页面
+			plus.webview.hide("friendship.html");
+		}
+
+		//设置背景图片的宽度，适应屏幕宽度
+		function setImg() {
+			var width = window.screen.availWidth;
+			var me = getCurUser();
+			$("#portraitImg").attr("src",toServerUrl( me.portrait ));
+			$("#nickname").text(me.nickName);
+			$("#background").attr("style", "width:" + width + "px;");
+
+			//头像
+			$("#logoinfo").attr("style", "margin-left:" + (width - 130) + "px;");
+			
+			
+			
+		}
+		//设置滚动属性
+		function setScrollValue() {
+			mui('.mui-scroll-wrapper').scroll({
+
+				　　
+				deceleration: 0.0005 //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+			});
+		}
+	</script>
+
+</html>

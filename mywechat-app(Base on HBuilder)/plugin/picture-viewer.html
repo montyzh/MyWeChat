@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+	<!--
+	时间：2018-02-28
+-->
+
+	<head>
+		<meta charset="utf-8">
+		<title>图片浏览器</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/iconfont.css">
+
+		<style>
+			html,
+			body {
+				background-color: #000000;
+			}
+			
+			.mui-bar-nav {
+				background-color: #000000;
+				box-shadow: 0 1px 3px #0A0A0A;
+				-webkit-box-shadow: 0 1px 3px #0A0A0A;
+			}
+			
+			.mui-bar-nav .mui-icon {
+				font-size: 36px;
+				font-weight: bold;
+			}
+			
+			.mui-title,
+			.mui-icon {
+				color: #AAAAAA;
+			}
+			
+			.mui-bar-tab {
+				background-color: #0A0A0A;
+			}
+			
+			.mui-bar-tab .mui-tab-item.mui-active {
+				color: #929292;
+			}
+			
+			.img-content {
+				width: 100%;
+				position: absolute;
+				text-align: center;
+				top: 50px;
+				bottom: 50px;
+			}
+			
+			.mui-slider {
+				height: 100%;
+			}
+			
+			.mui-slider-group {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.mui-slider-item {}
+			
+			.mui-slider-group img {
+				position: absolute;
+				width: 100%;
+				max-height: 490px;
+				top: 30%;
+				left: 30%;
+				-webkit-transform: translate(-30%, -30%);
+			}
+			
+			.mui-slider-indicator {
+				bottom: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-closeempty mui-pull-right"></a>
+		</header>
+		<div class="mui-content">
+			<div class="img-content">
+				<!--轮播图片-->
+				<div id="slider" class="mui-slider" style="">
+					<div id="slider-group" class="mui-slider-group">
+					</div>
+					<div id="slider-indicator" class="mui-slider-indicator">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="toolbar" class="mui-bar mui-bar-tab" style="display: none;">
+			<a id="btnCrop" class="mui-tab-item">
+				<span class="mui-icon iconfont icon-crop-picture"></span>
+				<span class="mui-tab-label">编辑图片</span>
+			</a>
+		</div>
+
+		<script type="text/javascript" src="../js/mui.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+		<script type="text/javascript" src="../js/jquery-1.10.2.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+
+		<script type="text/javascript">
+			(function() {
+				var $toolbar;
+				var $slider;
+				var $sliderGroup;
+				var $sliderIndicator;
+
+				var winPictureCropper;
+
+				var model = {};
+				var curIndex = 0;
+
+				mui.init({
+					beforeback: function() {
+						if(!(model.editable && model.openerId && model.cbFunctionName)) return true;
+
+						var opener = plus.webview.getWebviewById(model.openerId);
+						if(!opener) return true;
+
+						var modifiedPics = [];
+						for(var i = 0; i < model.pictures.length; i++) {
+							if(model.pictures[i].isModified) {
+								modifiedPics.push(model.pictures[i]);
+							}
+						}
+
+						if(modifiedPics.length > 0) {
+							// 如果有图片被编辑, 则回传被编辑的图片数据
+							mui.fire(opener, model.cbFunctionName, {
+								pictures: modifiedPics,
+								source: model.source
+							});
+						}
+
+						return true;
+					}
+				});
+
+				mui.plusReady(function() {
+					$toolbar = jQuery("#toolbar");
+					$sliderGroup = jQuery("#slider-group");
+					$sliderIndicator = jQuery("#slider-indicator");
+
+					window.addEventListener("loadData", loadData);
+					window.addEventListener("pictureModified", pictureModified);
+
+					mui("#btnCrop")[0].addEventListener("tap", cropStart);
+
+					mui(".mui-content").on("slide", ".mui-slider", function(event) {
+						curIndex = event.detail.slideNumber;
+						mui.toast("NO." + curIndex);
+					});
+
+					// 预加载图片编辑窗口
+					winPictureCropper = plus.webview.getWebviewById("pic-cropper");
+					if(!winPictureCropper) {
+						winPictureCropper = mui.preload({
+							"id": "pic-cropper",
+							"url": "cropper/cropper.html"
+						});
+					}
+				});
+
+				// 
+				/** @description 接收到从父窗口传来的参数
+				 * 
+				 * @param {JSObject} data 传入参数,包含属性:
+				 * <li> editable : boolean, 是否可编辑</li>
+				 * <li> pictures : Array, 图片数据, 对象数组, 应包含属性: id, data</li>
+				 * <li> openerId : String, 打开本窗口的父窗口ID</li>
+				 * <li> source : String, 用于标识触发本窗口打开事件源, 便于返回时主窗口处理回调</li>
+				 */
+				function loadData(event) {
+					model = jQuery.extend({
+						pictures: [],
+						editable: false
+					}, event.detail);
+
+					if(!mui.isArray(model.pictures)) {
+						model.pictures = [model.pictures];
+					}
+
+					var pictures = model.pictures;
+
+					// 设置编辑工具栏的状态
+					$toolbar.css ? r = z1 ")
+
+					// 若图片数<=1则不显示滚动提示
+					$sliderIndicator.css ? r = z1 ")
+
+					// 将图片添加到滚动列表
+					$sliderGroup.empty();
+					$sliderIndicator.empty();
+
+					for(var i = 0; i < pictures.length; i++) {
+						pictures[i].data.isModified = false;
+						var item = jQuery("<div>").addClass("mui-slider-item");
+						var img = jQuery("<img>").attr("src", pictures[i].data);
+						img.appendTo(item);
+						item.appendTo($sliderGroup);
+
+						var indicator = jQuery("<div class='mui-indicator'></div>");
+						if(i == 0) indicator.addClass("mui-active");
+						indicator.appendTo($sliderIndicator);
+					}
+
+					// 实例化图片轮播
+					mui('.mui-slider').slider().gotoItem(0);
+				};
+
+				// 启动编辑功能
+				function cropStart() {
+					mui.fire(winPictureCropper, "loadData", {
+						openerId: plus.webview.currentWebview().id,
+						source: curIndex,
+						cbFunctionName: "pictureModified",
+						picture: model.pictures[curIndex]
+					});
+					winPictureCropper.show("pop-in");
+				};
+
+				// 接收到从编辑窗口传来的参数
+				function pictureModified(event) {
+					if(!(event.detail && event.detail.source != null && event.detail.pictures)) return;
+
+					var source = event.detail.source;
+					var pic = event.detail.pictures[0];
+
+					// 更新被编辑的图片显示
+					if(model.pictures[source]) {
+						model.pictures[source].isModified = true;
+						model.pictures[source].data = pic.data;
+						jQuery("#slider-group img").eq(source).attr("src", pic.data);
+					}
+				};
+			})();
+		</script>
+
+	</body>
+
+</html>

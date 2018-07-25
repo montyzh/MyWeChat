@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<style>
+			.icon {
+				float: left;
+				width: 40px;
+				height: 40px;
+			}
+			
+			.userName {
+				float: left;
+				line-height: 40px;
+				margin-left: 20px;
+				font-size: 16px;
+				color: black;
+			}
+			
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">通讯录</h1>
+			<a id="add-friend" class="mui-icon mui-icon-personadd mui-pull-right"></a>
+		</header>
+		
+		
+		<div class="mui-content">
+			<div id="pullrefresh" class="mui-content">
+				<div class="mui-scroll">
+					<ul id="user-list" class="mui-table-view mui-table-view-chevron">
+					</ul>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/jquery-1.10.2.min.js"></script>
+	<script src="../js/myapp.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		var curUser;
+		mui.init({
+			pullRefresh: {
+				container: "#pullrefresh",
+				down: {
+					style: 'circle',
+					auto: true,
+					callback: loadMyFriends
+				}
+			}
+		});
+
+		mui.plusReady(function() {
+			window.addEventListener('barcodeScanCallback', barcodeScanCallback);
+
+			mui(document).on('tap', '#add-friend', function() {
+				mui.openWindow('../plugin/barcode_scan.html', 'plugin/barcode_scan.html');
+			})
+
+			curUser = getCurUser();
+			
+			loadMyFriends();
+		});
+
+
+
+
+
+		function loadMyFriends() {
+			ajax('getMyFriends', {
+				userId: curUser.id
+			}, {
+				success: function(data) {
+					var friends = data.result;
+					buildPersonList(friends);
+				},
+				complete: function() {
+					mui('#pullrefresh').pullRefresh().endPulldown();
+				}
+			});
+		}
+
+		function buildPersonList(friends) {
+			jQuery("#user-list").empty();
+			for(var i = 0; i < friends.length; i++) {
+				buildOnePerson(friends[i]);
+			}
+		}
+
+		var templete = '<a class="mui-navigate-right"><img class="icon" src="" data-field="portrait"/><p class="userName" data-field="nickName"></p></a>';
+
+		function buildOnePerson(friend) {
+			var li = jQuery("<li>");
+			li.addClass("mui-table-view-cell ");
+			li.html(templete);
+			li.find("[data-field]").each(function(i, ele) {
+				var $ele = jQuery(ele);
+				var dataField = $ele.attr("data-field");
+				switch(dataField) {
+					case 'portrait':
+						$ele.attr("src", toServerUrl(friend.portrait));
+						break;
+					default:
+						$ele.text(friend[dataField]);
+						break;
+				}
+			});
+
+			li.bind('tap', function() {
+				onFriendSelected(friend);
+			});
+
+			jQuery("#user-list").append(li);
+		}
+
+		function onFriendSelected(friend) {
+			mui.openWindow({
+				id: '/chat/chat.html',
+				url: '../chat/chat.html',
+				extras: {
+					"friend": friend
+				}
+			});
+		}
+
+		// 扫二维码返回结果
+		function barcodeScanCallback(event) {
+			if(event.detail && event.detail.result) { // 扫码得到结果
+				var result = null;
+				try {
+					result = JSON.parse(event.detail.result);
+				} catch(e) {}
+
+				if(result) {
+					ajax('addFriend', {
+						selfId: curUser.id,
+						friendId: result.friendId
+					}, {
+						success: function(data) {
+							if(data.code == 0) {
+								mui.toast('你已将' + data.result.nickName + '加为好友');
+								loadMyFriends();
+							} else {
+								mui.alert(data.message);
+							}
+						}
+					});
+				} else {
+					mui.alert('不支持的二维码数据');
+				}
+			}
+		}
+	</script>
+
+</html>

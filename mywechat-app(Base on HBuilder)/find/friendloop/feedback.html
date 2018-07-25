@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" class="feedback">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../../css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="../../css/feedback.css" />
+		<style>
+	    	.icon { float:left;
+	    		width: 30px;
+	    		height: 30px;
+	    	}
+	    	.serverName {
+    		float: left;
+    		line-height: 10px;
+    		margin-left: -5px;
+    		font-size: 16px;
+    		color: black;
+    	}			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-icon mui-icon-left-nav mui-pull-left" href="javascript:backMainPage()"></a>
+			<button id="submit" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">发表</button>
+			<h1 class="mui-title"></h1>
+		</header>
+		<div class="mui-content">
+		
+
+		
+			<div class="row mui-input-row">
+				<textarea id='question' class="mui-input-clear question" placeholder="这一刻的想法..."></textarea>
+			</div>
+			<p>图片(总大小10M以下)</p>
+			<div id='image-list' class="row image-list"></div>
+			<!--
+            	地址
+            -->
+				<ul class="mui-table-view mui-table-view-chevron">
+					<a class="mui-navigate-right" href="javascript:getPosition()">
+						<li class="mui-table-view-cell"> 
+							<img class="icon" src="../../img/geo.png"/>
+							<p id="geoposition" class="serverName">定位</p>
+						</li>
+					</a>
+				</ul>
+				
+		<br />
+		</div>
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery-1.10.2.min.js"></script>
+		<script src=" ../../js/feedback.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+//得到当前坐标位置
+function getPosition(){
+	//p经度纬度
+
+	plus.geolocation.getCurrentPosition( function ( p ) {
+	
+		$("#geoposition").text(p.address.street);
+		
+		
+	}, function ( e ) {
+	alert( "Geolocation error: " + e.message );
+	} );
+	
+	
+}						
+					
+					
+					function backMainPage(){
+			
+			//显示朋友圈
+
+			plus.webview.show("friendship.html");
+
+			//有的系统自带有延时显示页面
+			//隐藏当前页面时先等显示完成后再隐藏
+			setTimeout(
+				"plus.webview.hide('feedback.html')",
+				300
+			);
+	}
+					
+				
+			mui('.mui-scroll-wrapper').scroll();
+			
+
+
+
+			
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    
+    <link href="../css/mui.min.css" rel="stylesheet"/>
+    <style>
+			.title{
+				margin: 20px 15px 7px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			
+			#qrcode-container {
+				width: 200px;
+				margin: 50px auto;
+				background-color: #FFFFFF;
+			}
+			
+		</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<h1 class="mui-title">我</h1>
+	</header>
+	<div class="mui-content">
+		<ul class="mui-table-view">
+			<li class="mui-table-view-cell mui-media">
+				<a href="javascript:;">
+					<img id="myPortrait" class="mui-media-object mui-pull-left" src="">
+					<div class="mui-media-body">
+						<span id="myNickName"></span>
+						<p class='mui-ellipsis'>一点都不个性的签名~</p>
+					</div>
+				</a>
+			</li>
+		</ul>
+		<div id="qrcode-container">
+			<div id="qrcode" style="background-color: white;"></div>
+		</div>
+		
+		
+		<ul class="mui-table-view">
+			<li class="mui-table-view-cell">
+				自动登录
+				<div id="autoLogin" class="mui-switch  mui-switch-mini">
+					<div class="mui-switch-handle"></div>
+				</div>
+			</li>
+		</ul>
+		<div class="mui-content-padded">
+			<p>若关闭，每次进入均需要登录</p>
+		</div>
+	</div>
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/jquery-1.10.2.min.js"></script>
+<script src="../js/myapp.js"></script>
+<script src="../js/jquery.qrcode.min.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+	var curUser;
+	
+  	mui.init();
+  	
+  	mui.plusReady(function(){
+  		curUser = getCurUser();
+  		setMyInfo();
+  		setQrcode();
+  		
+  		// 设置自动登录按钮的初始状态
+		var isAutoLogin = getAutoLogin();
+		var autoLoginButton = document.getElementById("autoLogin");
+		autoLoginButton.classList[isAutoLogin ? 'add' : 'remove']('mui-active')
+		autoLoginButton.addEventListener('toggle', function(event) {
+			setTimeout(function() {
+				isAutoLogin = event.detail.isActive;
+				setAutoLogin(isAutoLogin);
+			}, 50);
+		}, false);
+  	});
+  	
+  	function setQrcode() {
+  		var info = {
+  			action : 'addFriend',
+  			friendId : curUser.id
+  		};
+  		jQuery('#qrcode').qrcode({width: 200,height: 200,text: JSON.stringify(info) });
+  	}
+  	
+  	function setMyInfo() {
+  		jQuery("#myPortrait").attr("src", toServerUrl(curUser.portrait));
+  		jQuery("#myNickName").text(curUser.nickName);
+  	}
+</script>
+</html>

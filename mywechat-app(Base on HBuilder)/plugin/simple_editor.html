@@ -1,0 +1,133 @@
+<!--
+	作者：Bailey
+	时间：2017-12-13
+	描述：进行简单单项信息修改的通用页面
+	
+	输入参数: {
+		ownerId 	{String} 	: 	打开本窗口的主窗口ID
+		callback 	{String} 	: 	回调方法名称
+		options 	{Object}	: 	{	
+			title 				{String}	: 	本窗口显示的标题
+			field 				{String}	: 	字段名
+			type				{String}	:	input标签的type属性值
+			value 				{String}	:	初始值
+			hint 				{String}	:	输入框内的提示信息
+		}
+	}
+	
+	返回参数(描述同上): {
+		field	：　字段名
+		value	：	值
+	}
+-->
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title></title>
+		<link rel="stylesheet" href="../css/mui.min.css?t=94e6a5aa801243e1a0ad68523053645b" />
+		<style>
+			.mui-input {
+				font-size: 14px;
+			}
+			
+			.mui-content[data-field-type="single-line"] textarea {
+				display: none;
+			}
+			
+			.mui-content[data-field-type="muti-line"] input {
+				display: none;
+			}
+			
+			.mui-content[data-field-type="muti-line"] .mui-input-row,
+			textarea {
+				height: 250px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"><span style="font-size: 16px;font-weight: 200;">取消</span></a>
+			<h1 id="title" class="mui-title"></h1>
+			<button id="btn-confirm" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">完成</button>
+		</header>
+		<div id="content" class="mui-content" data-field-type="single-line">
+			<div class="mui-table-view mui-input-group">
+				<div class="mui-input-row">
+					<input id="single-line" type="text" class="mui-input-clear mui-input" />
+					<textarea id="muti-line" class="mui-input"></textarea>
+				</div>
+			</div>
+		</div>
+	</body>
+
+	<script type="text/javascript" src="../js/mui.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" charset="utf-8">
+		(function() {
+			var options;
+			var ownerId;
+			var callback;
+
+			var inputElement;
+			var inputArea;
+
+			mui.init({
+				swipeBack: true
+			});
+
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				ownerId = self.ownerId;
+				callback = self.callback;
+				options = self.options;
+
+				inputElement = document.getElementById("single-line");
+				inputArea = document.getElementById("muti-line");
+
+				mui(".mui-bar-nav").on("tap", "#btn-confirm", onConfirm);
+
+				setView();
+			});
+
+			function setView() {
+				document.getElementById("title").innerText = options.title || "编辑";
+				document.getElementById("content").setAttribute('data-field-type', (options.type === 'textarea') ? 'muti-line' : 'single-line');
+				if(options.type === 'textarea') { // 多行编辑
+					inputArea.value = options.value || "";
+					inputArea.placeholder = options.hint || "";
+					if(options.maxLength) inputArea.maxLength = options.maxLength;
+				} else {
+					inputElement.type = options.type || "text";
+					inputElement.value = options.value || "";
+					inputElement.placeholder = options.hint || "";
+					if(options.maxLength) inputElement.maxLength = options.maxLength;
+				}
+			}
+
+			function onConfirm() {
+				var value = (options.type === 'textarea') ? inputArea.value : inputElement.value;
+				var orgValue = options.value || "";
+
+				if(value == orgValue) {
+					// 若值未变, 则作取消处理
+				} else {
+					var owner = plus.webview.getWebviewById(ownerId);
+					if(owner) {
+						mui.fire(owner, callback, {
+							field: options.field,
+							value: value
+						})
+					}
+				}
+
+				mui.back();
+			}
+		})();
+	</script>
+
+</html>

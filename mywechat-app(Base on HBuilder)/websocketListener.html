@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<script src="js/mui.min.js"></script>
+	<script src="js/myapp.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		(function() {
+			var websocket = null;
+			var curUser = null;
+			
+			var autoReconnect = true;
+			
+			mui.init();
+
+			mui.plusReady(function() {
+				curUser = getCurUser();
+				connectWebSocket();
+			});
+			
+			function connectWebSocket (){
+				//判断当前浏览器是否支持WebSocket
+				if('WebSocket' in window) {
+					websocket = new WebSocket(WEBSOCKET_URL);
+				} else {
+					mui.alert('当前浏览器不支持websocket')
+				}
+	
+				//连接发生错误的回调方法
+				websocket.onerror = function() {
+					mui.toast("WebSocket连接发生错误, 你可能不能即时收到好友发来的消息");
+				};
+	
+				//连接成功建立的回调方法
+				websocket.onopen = function() {
+					console.log("WebSocket已连接成功");
+				}
+	
+				//接收到消息的回调方法
+				websocket.onmessage = function(event) {
+					broadcastServerData(event.data);
+				}
+	
+				//连接关闭的回调方法
+				websocket.onclose = function() {
+					mui.toast("WebSocket连接关闭");
+					if (autoReconnect) connectWebSocket();
+				}
+	
+				//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+				window.onbeforeunload = function() {
+					autoReconnect  = false;
+					websocket.close();
+				}
+			}
+			
+			var listeners = ['/chat/chat.html','/chat/index.html'];
+			function broadcastServerData(responseText) {
+				var msg = null;
+				try {
+					var data = JSON.parse(responseText);
+					if (!data || data.code != 0 || !data.result) return;
+					var msg = data.result;
+					if (msg.toReceiver.id !== curUser.id && msg.toReceiver.id !== 'ALL') {
+						return;
+					}
+				} catch(e) {
+					
+					return;
+				}
+				
+				for (var i = 0; i < listeners.length; i++) {
+					var view = plus.webview.getWebviewById(listeners[i]);
+					if (view) {
+						mui.fire(view, 'WEBSOCKET_DATA_ARRIVED', msg);
+					}
+				}
+			}
+		})();
+	</script>
+
+</html>

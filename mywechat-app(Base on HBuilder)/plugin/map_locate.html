@@ -1,0 +1,257 @@
+<!--
+	作者：Bailey
+	时间：2017-12-13
+	描述：使用地图进行定位, 选择地址
+	
+	输入参数: {Object} 	:  params {
+		options		{Object}	:	配置信息, 包含如下信息:
+									{
+										ownerId 	{String} 	: 	打开本窗口的主窗口ID
+										callback 	{String} 	: 	回调方法名称
+										title 		{String}	: 	本窗口显示的标题 (可选)
+									}
+
+		address 	{Object}	:   初始位置信息对象, 包含如下信息:
+		{
+			coordinate : {
+				coordsType			{String}	: 	座标类型
+				latitude			{Number}	: 	纬度
+				longitude			{Number}	: 	经度
+			}
+				description			{String}	: 	位置的描述, 如:云南省昆明市宜良县温泉路11号
+			}
+		}
+	
+	返回参数   	{Object} 	:  
+		{
+			coordinate : {
+				coordsType			{String}	: 	座标类型
+				latitude			{Number}	: 	纬度
+				longitude			{Number}	: 	经度
+			}
+			description			{String}	: 	位置的描述, 如:云南省昆明市宜良县温泉路11号
+		}
+-->
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title></title>
+		<link rel="stylesheet" href="../css/mui.min.css?t=94e6a5aa801243e1a0ad68523053645b" />
+		<style>
+			#map {
+				width: 100%;
+				position: fixed;
+				top: 94px;
+				bottom: 0px;
+				text-align: center;
+				background: #FFFFFF;
+				color: #BBBBBB;
+				font-size: 14px;
+			}
+			
+			#address-panel {
+				width: 100%;
+				padding: 5px 15px;
+				height: 50px;
+				border-bottom: 1px solid #DDDDDD;
+				background-color: #fff;
+				color: #8a6de9;
+				font-size: 12px;
+			}
+			
+			#address-panel span {
+				line-height: 18px;
+			}
+			
+			#address-panel td {
+				vertical-align: middle;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"><span style="font-size: 16px;font-weight: 200;">取消</span></a>
+			<h1 id="title" class="mui-title">定位</h1>
+			<button id="btn-confirm" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">完成</button>
+		</header>
+		<div class="mui-content">
+			<table id="address-panel" cellpadding="5px">
+				<tr>
+					<td width="30px"><i class="mui-icon mui-icon-location mui-col-xs-1"></i></td>
+					<td><span id="address-text" class="mui-ellipsis-2"></span></td>
+					<td width="45px" align="center">
+						<a id="btn-to-current-location" href="#" class="mui-icon mui-icon-navigate"></a>
+					</td>
+				</tr>
+			</table>
+			<div id="map">地图加载中...</div>
+		</div>
+	</body>
+
+	<script type="text/javascript" src="../js/mui.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" src="../js/app.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" src="../js/city.data-zh.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" src="../js/address-util.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" charset="utf-8">
+		(function() {
+			mui.init({
+				swipeBack: true
+			});
+
+			var mapCoordsType = app.CONSTANT.coords_type; // 嵌入的SDK默认地图坐标类型
+			var defaultCenter = app.CONSTANT.map_default_center;
+
+			var options; // 主窗口传来的参数
+			var address, origAddress = {};
+
+			var addressText;
+
+			var em = null, // 地图DOM元素
+				map = null, // 地图对象
+				marker = null; // 地图上代表用户位置的标注
+			var bubble = null; // 地图标注所泡
+			var origPoint;
+
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				options = self.params.options;
+				address = self.params.address || {
+					coordinate: {}
+				};
+				mui.extend(true, origAddress, address);
+
+				addressText = document.getElementById('address-text');
+
+				if(options.title) {
+					document.getElementById("title").innerText = options.title;
+				}
+
+				document.getElementById("btn-confirm").addEventListener("tap", onConfirm);
+				document.getElementById("btn-to-current-location").addEventListener("tap", getUserLocation);
+
+				addressText.innerText = address.description || "";
+
+				initMap();
+			});
+
+			// 初始化地图组件
+			function initMap() {
+				em = document.getElementById("map");
+				if(em && window.plus && !map) {
+
+					origPoint = (address.coordinate.longitude && address.coordinate.latitude) ? new plus.maps.Point(address.coordinate.longitude, address.coordinate.latitude) : null;
+					var center = (origPoint) ? origPoint : new plus.maps.Point(defaultCenter.longitude, defaultCenter.latitude);
+
+					// 构建地图组件
+					map = new plus.maps.Map("map", {
+						center: center,
+						zoomControls: true,
+						zoom: 15
+					});
+
+					// 注册地图状态变化事件监听
+					map.onstatuschanged = mapStatusChanged;
+
+					if(!origPoint) {
+						if(address.description) { // 参数中有地址, 尝试通过地址反查坐标
+							plus.maps.Map.geocode(address.description, {
+								city: '中国'
+							}, function(event) {
+								map.setCenter(event.coord);
+							});
+						} else { // 输入参数中无位置信息, 直接从地图取当前位置
+							getUserLocation();
+						}
+					}
+				}
+			}
+
+			// 获取用户当前位置
+			function getUserLocation() {
+				map.getUserLocation(function(state, point) {
+					if(0 == state) {
+						// 查询当前位置的地理信息
+						plus.maps.Map.reverseGeocode(point, {
+							coordType: mapCoordsType
+						}, function(event) {
+							map.setCenter(event.coord);
+						});
+					}
+				})
+			}
+
+			function mapStatusChanged(e) {
+				if(origPoint) {
+					setMarkerPosition(origPoint);
+					origPoint = null;
+				} else {
+					address.coordinate.latitude = e.center.latitude;
+					address.coordinate.longitude = e.center.longitude;
+					setMarkerPosition(e.center);
+
+					// 查询当前位置的地理信息
+					plus.maps.Map.reverseGeocode(e.center, null, function(event) {
+						address.coordinate.coordsType = event.coordType;
+						// 转换后的地理位置
+						addressText.innerText = address.description = event.address;
+						console.log(JSON.stringify(event));
+					});
+				}
+			}
+
+			// 将地图中心点移至指定位置, 同时将位置标记移到地图中心点
+			function setMarkerPosition(point) {
+				if(!marker) {
+					marker = new plus.maps.Marker(point);
+					bubble = new plus.maps.Bubble("打造最好的HTML5移动开发工具");
+					marker.setBubble(bubble);
+					map.addOverlay(marker);
+				}
+				marker.setPoint(point);
+			}
+
+			// 完成编辑
+			function onConfirm() {
+				var changed = false;
+
+				// 判断地址是否有变化
+				for(key in origAddress) {
+					if(origAddress[key] != address[key]) {
+						changed = true;
+						break;
+					}
+
+					if(typeof(origAddress[key]) == "object") {
+						for(key2 in origAddress[key]) {
+							if(origAddress[key][key2] != address[key][key2]) {
+								changed = true;
+								break;
+							}
+						}
+						if(changed) break;
+					}
+				}
+
+				if(changed) {
+					// 选择的地址有变化, 通知主调方
+					var owner = plus.webview.currentWebview().opener(); //plus.webview.getWebviewById(options.ownerId);
+					if(owner) {
+						mui.fire(owner, options.callback, {
+							field: options.field,
+							address: address
+						})
+					}
+				}
+
+				mui.back();
+			}
+		})();
+	</script>
+
+</html>

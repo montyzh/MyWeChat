@@ -1,0 +1,308 @@
+<!--
+	作者：Bailey
+	时间：2017-12-13
+	描述：进行地址信息修改的通用页面
+	
+	输入参数: 
+	params: {
+				options: {
+					title			{String}	: 	本窗口显示的标题
+					field			{String}	: 	字段名
+					ownerId 		{String} 	: 	打开本窗口的主窗口ID
+					callback 		{String} 	: 	回调方法名称
+					divisionHint	{String}	: 	区域选择框内的提示
+					detailHint		{String}	: 	详细地址框内的提示
+					locateHint		{String}	: 	定位提示信息
+				},
+				address: {
+					coordinate : {
+						coordsType			{String}	: 	座标类型
+						latitude			{Number}	: 	纬度
+						longitude			{Number}	: 	经度
+					}
+					fullDivisionCode	{String}	:	完整区域代码(含代码和描述), 如: 530125 云南省 昆明市 宜良县, NOTE: 若设置了本属性, 则divisionCode和division无效, 本页面将自动根据fullDivisionCode计算
+					divisionCode 		{String}	:	区域代码, 如: 530125
+					division 			{String}	:	区域名称, 如: 云南省 昆明市 宜良县
+					detail				{String}	:	详细地址, 如: 人民路1号
+				}
+			}
+	}
+	
+	返回参数(描述同上): {
+		field		{String}	: 	字段名
+		address		{
+			coordinate : {
+				coordsType			{String}	: 	座标类型
+				latitude			{Number}	: 	纬度
+				longitude			{Number}	: 	经度
+			}
+			fullDivisionCode	{String}	:	完整区域代码(含代码和描述), 如: 530125 云南省 昆明市 宜良县
+			divisionCode 		{String}	:	区域代码, 如: 530125
+			division 			{String}	:	区域名称, 如: 云南省 昆明市 宜良县
+			detail				{String}	:	详细地址, 如: 人民路1号
+		}
+	}
+-->
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title></title>
+		<link rel="stylesheet" href="../css/mui.min.css?t=94e6a5aa801243e1a0ad68523053645b" />
+		<link rel="stylesheet" href="../css/mui.picker.min.css?t=94e6a5aa801243e1a0ad68523053645b" />
+		<link rel="stylesheet" href="../css/mui.poppicker.css?t=94e6a5aa801243e1a0ad68523053645b" />
+
+		<style>
+			.mui-input {
+				font-size: 14px;
+			}
+			
+			[data-location] {
+				padding: 10px;
+				font-size: 14px;
+				color: #007aff;
+				line-height: 30px;
+				color: #AAAAAA;
+			}
+			
+			[data-location=true] {
+				color: #007aff;
+			}
+			
+			#locate-hint {
+				font-size: 12px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="padding-right: 15px;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"><span style="font-size: 16px;font-weight: 200;">取消</span></a>
+			<h1 id="title" class="mui-title"></h1>
+			<button id="btn-confirm" data-loading-text=" " class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">确定</button>
+		</header>
+		<div class="mui-content">
+			<div class="mui-table-view">
+				<div class="mui-input-group mui-table-view-cell">
+					<div class="mui-input-row ">
+						<input id="division" type="text" class="mui-input mui-ellipsis" readonly="readonly" />
+					</div>
+					<div class="mui-input-row ">
+						<input id="detail" type="text" class="mui-input-clear mui-input mui-ellipsis" />
+					</div>
+					<div data-location="true">
+						<i class="mui-icon mui-icon-location"></i> <span id="locationInfo">未定位</span>
+						<button id="btn-get-location" type="button" class="mui-btn mui-btn-purple mui-icon mui-icon-map mui-pull-right"> 地图定位</button>
+					</div>
+				</div>
+			</div>
+			<p id="locate-hint" class="mui-content-padded"></p>
+		</div>
+	</body>
+
+	<script type="text/javascript" src="../js/mui.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" src="../js/mui.picker.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" src="../js/mui.poppicker.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" src="../js/city.data-zh.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" src="../js/address-util.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<script type="text/javascript" charset="utf-8">
+		(function() {
+			mui.init({
+				swipeBack: true
+			});
+
+			var options;
+			var address, origAddress = {};
+
+			var cityDataYn = addressUtil.trimData(cityDataZh, '530000'); // 云南区划数据
+
+			var inputDivision, inputDivisionCode, inputDetail, locationInfo;
+
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				options = self.params.options;
+				address = self.params.address || {
+					coordinate: {}
+				};
+				mui.extend(true, origAddress, address);
+
+				window.addEventListener("mapLoacted", mapLoacted);
+
+				inputDivision = document.getElementById('division');
+				inputDetail = document.getElementById('detail');
+				locationInfo = document.getElementById('locationInfo');
+
+				document.getElementById("btn-confirm").addEventListener("tap", function(){
+					mui(this).button('loading');
+					document.activeElement.blur(); 
+					mui.later(function(){
+						onConfirm();
+						mui('#btn-confirm').button('reset');
+					}, 600);
+				});
+				document.getElementById("btn-get-location").addEventListener("tap", function() {
+					address.detail = inputDetail.value; // 直接点按钮不触发change...
+					getLocation();
+				});
+				inputDetail.addEventListener("change", function() {
+					address.detail = this.value;
+				});
+
+				initAddressPicker();
+
+				initView();
+			});
+
+			// 初始化地址选择器
+			function initAddressPicker() {
+				var addressPicker = new mui.PopPicker({
+					layer: 3
+				});
+				addressPicker.setData(cityDataYn);
+				inputDivision.addEventListener('tap', function(event) {
+					document.activeElement.blur(); // 让获得输入焦点的元素失去焦点, 以关闭键盘
+
+					if(address.divisionCode) {
+						addressPicker.pickers[0].setSelectedValue(address.divisionCode.substr(0, 2) + "0000");
+						addressPicker.pickers[1].setSelectedValue(address.divisionCode.substr(0, 4) + "00");
+						addressPicker.pickers[2].setSelectedValue(address.divisionCode);
+					}
+					addressPicker.show(onAddressPicked);
+				}, false);
+			}
+
+			// 初始化显示内容
+			function initView() {
+				document.getElementById("title").innerText = options.title || "编辑地址";
+				inputDivision.placeholder = options.divisionHint || "请选择省市县";
+				inputDetail.placeholder = options.detailHint || "详细地址, 不含省市县信息";
+				document.getElementById("locate-hint").innerText = options.locateHint || '';
+
+				var fc = address.fullDivisionCode;
+				if(fc) {
+					address.divisionCode = fc.substr(0, fc.indexOf(" "));
+					address.division = fc.substr(fc.indexOf(" ") + 1);
+				}
+
+				updateAddressView();
+			}
+
+			// 设置地址信息显示
+			function updateAddressView() {
+				inputDivision.value = address.division || "";
+				inputDetail.value = address.detail || "";
+
+				var coord = address.coordinate;
+
+				if(coord.coordsType != null && coord.latitude != null && coord.longitude != null) {
+					locationInfo.innerText = "已定位";
+					locationInfo.parentNode.setAttribute("data-location", "true");
+				} else {
+					locationInfo.innerText = "未定位";
+					locationInfo.parentNode.setAttribute("data-location", "false");
+				}
+			}
+
+			// 用户在地址选择器选定了地址
+			function onAddressPicked(items) {
+				var _getParam = function(obj, param) {
+					return obj[param] || '';
+				};
+
+				var cityCode = _getParam(items[2], 'value');
+				var cityText = _getParam(items[0], 'text') + " " + _getParam(items[1], 'text') + " " + _getParam(items[2], 'text');
+
+				address.divisionCode = cityCode;
+				address.division = cityText;
+				updateAddressView();
+			}
+
+			//  打开地图定位窗口, 让用户选择位置
+			function getLocation() {
+				var desc = (address.division || "") + (address.detail || "");
+				mui.openWindow({
+					id: "plugin/map_locate.html",
+					url: "./map_locate.html",
+					extras: {
+						params: {
+							options: {
+								ownerId: plus.webview.currentWebview().id,
+								callback: 'mapLoacted'
+							},
+							address: {
+								coordinate: address.coordinate,
+								description: (desc) ? (desc).replace(/\s/g, "") : null
+							}
+						}
+					}
+				});
+			}
+
+			// 地图定位完成
+			function mapLoacted() {
+				var data = event.detail.address;
+
+				mui.extend(data, addressUtil.addressParse(cityDataZh, data.description) || {});
+
+				address.coordinate = data.coordinate;
+				address.divisionCode = data.divisionCode;
+				address.division = data.division;
+				address.fullDivisionCode = data.fullDivisionCode;
+
+				if(data.detail) {
+					if(address.detail) {
+						if(address.detail != data.detail) {
+							mui.confirm(data.detail, '使用新地址?', ["否", '是'], function(e) {
+								if(e.index == 1) {
+									address.detail = data.detail;
+								}
+								updateAddressView();
+							})
+						}
+					} else {
+						address.detail = data.detail;
+					}
+				}
+				updateAddressView();
+			}
+
+			// 完成编辑
+			function onConfirm() {
+				if(address.divisionCode && address.division) {
+					address.fullDivisionCode = address.divisionCode + " " + address.division;
+				} else {
+					mui.alert('请选择省市县(行政区划)', '提示');
+					return;
+				}
+				
+				if(inputDetail.value) {
+					address.detail = inputDetail.value;
+				} else {
+						mui.alert('请填写详细地址', '提示');
+					return;
+				}
+
+				if((origAddress.divisionCode == address.divisionCode || (origAddress.fullDivisionCode == address.fullDivisionCode)) &&
+					(origAddress.detail == address.detail) &&
+					(origAddress.coordsType == address.coordsType && origAddress.longitude == address.longitude && origAddress.latitude == address.latitude)) {
+					// 值未变
+				} else {
+					// 值变化, 回传数据
+					var owner = plus.webview.getWebviewById(options.ownerId);
+					if(owner) {
+						mui.fire(owner, options.callback, {
+							field: options.field,
+							address: address
+						})
+					}
+				}
+				plus.webview.close(plus.webview.currentWebview());
+			}
+		})();
+	</script>
+
+</html>

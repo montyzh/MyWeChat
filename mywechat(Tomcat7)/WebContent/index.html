@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<title>my wechat</title>
+<style>
+body,div,p,h1,h2,h3,em,span,a,td,form,input,select,textarea {
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	font-style: normal;
+	font-weight: normal;
+	font-family: \5FAE\8F6F\96C5\9ED1;
+}
+
+body {
+	font-family: "Helvetica Neue", Helvetica, STHeiTi, sans-serif;
+	color: #808080;
+	height: 100%;
+	background: #e8e8e8;
+}
+
+img {
+	border: none;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+}
+
+div {
+	height: auto;
+}
+
+.clear {
+	clear: both;
+}
+
+.wrapper {
+	height: 100%
+}
+
+.content {
+	height: 90%;
+	position: relative;
+}
+
+.content img {
+	max-width: 100%;
+}
+
+.download {
+	font-size: 24px;
+	text-align: center;
+	margin: 20px 0;
+	line-height: 2em;
+	font-weight: bold;
+	color: #000000;
+	opacity: 0.7
+}
+
+.two-code {
+	text-align: center;
+}
+
+.two-code img {
+	max-width: 50%
+}
+
+.footer {
+	padding-top: 2em;
+	margin: 0 auto;
+	width: 99%;
+	height: 10%;
+}
+
+.footer div {
+	font-size: 12px;
+	text-align: center;
+}
+
+a.android-down {
+	background: #00bd3a;
+}
+
+a.iPhone-down {
+	background: #4293ec;
+}
+
+a.android-down em {
+	width: 32px;
+	background-position: 0px 0;
+}
+
+a.iPhone-down em {
+	width: 30px;
+	font-size: 12px;
+	background-position: 0 -42px;
+}
+
+a.down em {
+	height: 37px;
+	background-image: url(imgs/common/down_icon.png);
+	background-repeat: no-repeat;
+	display: inline-block;
+	vertical-align: -10px;
+	margin-right: 10px;
+}
+
+a.down {
+	width: 274px;
+	height: 57px;
+	display: block;
+	margin: 25px auto;
+	font-size: 20px;
+	color: #fff;
+	text-decoration: none;
+	padding: 22px 0 0;
+	text-align: center;
+	border-radius: 5px;
+}
+
+.show-tips {
+	width: 100%;
+	background: #fff;
+	padding: 20px 30px;
+	display: none;
+}
+
+.show-tips p {
+	font-size: 18px;
+	font-family: \5FAE\8F6F\96C5\9ED1;
+	color: #000;
+	font-weight: bold;
+	line-height: 30px;
+}
+
+.jiantou {
+	position: absolute;
+	right: 12px;
+	top: 12px;
+}
+
+.directions p {
+	line-height: 24px;
+}
+
+a.desktop-down {
+	background: #ff5800;
+}
+
+a.desktop-down em {
+	width: 32px;
+	background-position: 0px -80px;
+}
+</style>
+
+<script>
+    var _hmt = _hmt || [];
+</script>
+
+</head>
+<body>
+	<div class="wrapper">
+		<div class="content">
+			<div class="show-tips" id="showTips">
+				<p style="margin-bottom: 20px;">链接跳转被限制了</p>
+				<p>点击右上角</p>
+				<p>选择在浏览器（或Safari）打开</p>
+				<p>即可下载</p>
+				<p class="jiantou">
+					<img src="imgs/common/jiantou.png" />
+				</p>
+			</div>
+
+			<div class="download clear">My Wechat</div>
+			<!-- 扫二维码下载  -->
+       		 <div class="two-code clear"><img src="imgs/common/app_dld_url.png"></div>
+       
+			<div style="text-align: center;">
+				<a id="AndroidDowns" class="android-down down" href="mywechat.apk"><em></em>Android版下载</a>
+            <!--	<a id="iPhoneDowns" class="iPhone-down down" href="https://itunes.apple.com/us/app/啵啵车/id1355515118?l=zh&ls=1&mt=8"><em></em>iPhone版下载</a>
+           
+            <a id="desktopDowns" class="desktop-down down" href="/res/client/desktop/CloudHubSetup.exe"><em></em>桌面端本地下载</a>       
+             -->
+			</div>
+		</div>
+
+	</div>
+	<script src="jquery-1.10.2.min.jsjquery-1.11.3.min.js"></script>
+	<script>
+        function is_weixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == "micromessenger" || ua.match(/QQ/i) == "qq") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        function is_ios() {
+            return !!navigator.userAgent.match(/(iPhone|iPod|ios|iPad)/i);
+        }
+        
+        if (is_weixin() && !is_ios()) {
+            $('#showTips').show();
+        } else {
+            $('#iPhoneDowns').bind('click', function() {
+                if (is_ios()) {
+                    return true;
+                } else {
+                    // alert("请用苹果手机扫描二维码进行下载");
+                    return false;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

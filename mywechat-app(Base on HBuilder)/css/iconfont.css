@@ -1,0 +1,267 @@
+@font-face {
+	font-family: "iconfont";
+	src: url('../fonts/iconfont.ttf') format('truetype');
+	/* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+}
+
+.iconfont {
+	font-family: "iconfont" !important;
+	font-size: 16px;
+	font-style: normal;
+	-webkit-font-smoothing: antialiased;
+}
+
+.icon-icoratebad:before { content: "\e604"; }
+
+.icon-appreciate:before { content: "\e644"; }
+
+.icon-favorfill:before { content: "\e64b"; }
+
+.icon-favor:before { content: "\e64c"; }
+
+.icon-locationfill:before { content: "\e651"; }
+
+.icon-location:before { content: "\e652"; }
+
+.icon-phone:before { content: "\e653"; }
+
+.icon-evaluate-good:before { content: "\e672"; }
+
+.icon-top:before { content: "\e69e"; }
+
+.icon-qrcode:before { content: "\e6b0"; }
+
+.icon-jiedanshouli:before { content: "\e605"; }
+
+.icon-appreciatefill:before { content: "\e6e3"; }
+
+.icon-service:before { content: "\e6ff"; }
+
+.icon-down:before { content: "\e703"; }
+
+.icon-fav-star-belt:before { content: "\e6a8"; }
+
+.icon-evaluate-bad:before { content: "\e723"; }
+
+.icon-deal:before { content: "\e616"; }
+
+.icon-cry:before { content: "\e69c"; }
+
+.icon-form:before { content: "\e6a2"; }
+
+.icon-smile:before { content: "\e6af"; }
+
+.icon-inbox:before { content: "\e6b1"; }
+
+.icon-sum-money:before { content: "\e795"; }
+
+.icon-confirm-1:before { content: "\e603"; }
+
+.icon-edit-2:before { content: "\e68a"; }
+
+.icon-print:before { content: "\e6c9"; }
+
+.icon-crop-picture:before { content: "\e61d"; }
+
+.icon-safe:before { content: "\e769"; }
+
+.icon-dengdaiqueren:before { content: "\e60b"; }
+
+.icon-rotate-left:before { content: "\e77e"; }
+
+.icon-bad:before { content: "\e716"; }
+
+.icon-good:before { content: "\e717"; }
+
+.icon-rotate-right-90:before { content: "\e65e"; }
+
+.icon-rotate-left-90:before { content: "\e65f"; }
+
+.icon-add-pictures:before { content: "\e601"; }
+
+.icon-wancheng:before { content: "\e6a6"; }
+
+.icon-two-stars:before { content: "\e646"; }
+
+.icon-files-1:before { content: "\e641"; }
+
+.icon-pdf:before { content: "\e740"; }
+
+.icon-erweima:before { content: "\e645"; }
+
+.icon-saoyisao:before { content: "\e649"; }
+
+.icon-people-group:before { content: "\e622"; }
+
+.icon-commit-paper:before { content: "\e668"; }
+
+.icon-timer:before { content: "\e6ef"; }
+
+.icon-chat:before { content: "\e658"; }
+
+.icon-commited-olded:before { content: "\e667"; }
+
+.icon-complete-4:before { content: "\e66a"; }
+
+.icon-shoplight:before { content: "\e7b8"; }
+
+.icon-fav-heart-empty:before { content: "\e637"; }
+
+.icon-edit:before { content: "\e609"; }
+
+.icon-rotate-right-90d:before { content: "\e613"; }
+
+.icon-rotate-left-90d:before { content: "\e614"; }
+
+.icon-add-picture-square:before { content: "\e606"; }
+
+.icon-news:before { content: "\e6aa"; }
+
+.icon-wait2:before { content: "\e615"; }
+
+.icon-contract-3:before { content: "\e619"; }
+
+.icon-bussiness-card:before { content: "\e753"; }
+
+.icon-fav-star-belt-2:before { content: "\e620"; }
+
+.icon-medalfill:before { content: "\e7c1"; }
+
+.icon-medal:before { content: "\e7c2"; }
+
+.icon-sign:before { content: "\e628"; }
+
+.icon-moneybagfill:before { content: "\e7ce"; }
+
+.icon-moneybag:before { content: "\e7d1"; }
+
+.icon-add-picture-2:before { content: "\e67c"; }
+
+.icon-recycling:before { content: "\e9ab"; }
+
+.icon-man2:before { content: "\e63d"; }
+
+.icon-reject:before { content: "\e67f"; }
+
+.icon-scan:before { content: "\e62b"; }
+
+.icon-complete:before { content: "\e60c"; }
+
+.icon-orders:before { content: "\e77b"; }
+
+.icon-upload-to-cloud:before { content: "\e633"; }
+
+.icon-chaping:before { content: "\e7dc"; }
+
+.icon-wait:before { content: "\e68f"; }
+
+.icon-history:before { content: "\e6a0"; }
+
+.icon-add-picture:before { content: "\e624"; }
+
+.icon-back:before { content: "\e62a"; }
+
+.icon-confirm:before { content: "\e659"; }
+
+.icon-oil-tank-truck:before { content: "\e642"; }
+
+.icon-linkman:before { content: "\e6f3"; }
+
+.icon-community_light:before { content: "\e7d5"; }
+
+.icon-edit_light:before { content: "\e7de"; }
+
+.icon-hot_light:before { content: "\e7df"; }
+
+.icon-order-deleted:before { content: "\e60e"; }
+
+.icon-warehouse2:before { content: "\e612"; }
+
+.icon-pictures-2:before { content: "\e787"; }
+
+.icon-not-commit:before { content: "\e6b2"; }
+
+.icon-phone2:before { content: "\e623"; }
+
+.icon-wait-confirm:before { content: "\e60a"; }
+
+.icon-wait-accept:before { content: "\e60f"; }
+
+.icon-outbox:before { content: "\e61a"; }
+
+.icon-order-accepted:before { content: "\e610"; }
+
+.icon-rotate-right:before { content: "\e68c"; }
+
+.icon-trash-can:before { content: "\e630"; }
+
+.icon-warehouse:before { content: "\e617"; }
+
+.icon-man:before { content: "\e60d"; }
+
+.icon-zan:before { content: "\e870"; }
+
+.icon-zan1:before { content: "\e871"; }
+
+.icon-camera:before { content: "\e872"; }
+
+.icon-dingdanyichenggong:before { content: "\e899"; }
+
+.icon-recycling-empty:before { content: "\e632"; }
+
+.icon-confirm-circle:before { content: "\e621"; }
+
+.icon-complete1:before { content: "\e611"; }
+
+.icon-copy:before { content: "\e650"; }
+
+.icon-oil-can:before { content: "\e61e"; }
+
+.icon-running:before { content: "\e627"; }
+
+.icon-fav-star-square:before { content: "\e67b"; }
+
+.icon-yiquxiaodingdan:before { content: "\e6ad"; }
+
+.icon-statistics:before { content: "\e61b"; }
+
+.icon-picture-error:before { content: "\e67d"; }
+
+.icon-confirm-2:before { content: "\e625"; }
+
+.icon-rated:before { content: "\e602"; }
+
+.icon-commited:before { content: "\e608"; }
+
+.icon-complete-3:before { content: "\e629"; }
+
+.icon-complain:before { content: "\e6dd"; }
+
+.icon-exit:before { content: "\e643"; }
+
+.icon-kefu:before { content: "\e626"; }
+
+.icon-pictures-1:before { content: "\e600"; }
+
+.icon-fav-star-circle:before { content: "\e64d"; }
+
+.icon-good-1:before { content: "\e618"; }
+
+.icon-cancel:before { content: "\e755"; }
+
+.icon-add-pic-camera:before { content: "\e607"; }
+
+.icon-unavailable-cross:before { content: "\e61f"; }
+
+.icon-not-accept:before { content: "\e62f"; }
+
+.icon-canceled:before { content: "\e634"; }
+
+.icon-fire:before { content: "\e8f4"; }
+
+.icon-complete-2:before { content: "\e9ac"; }
+
+.icon-delegate:before { content: "\e61c"; }
+
+.icon-certificate:before { content: "\e654"; }
+

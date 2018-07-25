@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+
+		<link href="css/mui.min.css" rel="stylesheet" />
+
+	</head>
+
+	<body>
+		<nav class="mui-bar mui-bar-tab">
+			<a class="mui-tab-item mui-active" data-action="/chat/index.html" href="#tabbar">
+				<span class="mui-icon mui-icon-chatbubble"></span>
+				<span class="mui-tab-label">微信</span>
+			</a>
+			<a class="mui-tab-item" data-action="/contact/index.html" href="#tabbar-with-chat">
+				<span class="mui-icon mui-icon-personadd"></span>
+				<span class="mui-tab-label">通讯录</span>
+			</a>
+			<a class="mui-tab-item" data-action="/find/index.html" href="#tabbar-with-contact">
+				<span class="mui-icon mui-icon-navigate"></span>
+				<span class="mui-tab-label">发现</span>
+			</a>
+			<a class="mui-tab-item" data-action="/me/index.html" href="#tabbar-with-map">
+				<span class="mui-icon mui-icon-person"></span>
+				<span class="mui-tab-label">我</span>
+			</a>
+		</nav>
+	</body>
+	<script src="js/mui.min.js"></script>
+	<script src="js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		var subpage_style = {
+			top: '0px',
+			bottom: '51px'
+		};
+		var viewsUrl = [
+			'/chat/index.html',
+			'/contact/index.html',
+			'/find/index.html',
+			'/me/index.html'
+		];
+		var subViews = [];
+
+		mui.init();
+
+		mui.plusReady(function() {
+			initActionHandler();
+			createSubViews();
+
+			createWebsocketListener();
+		});
+
+		function createSubViews() {
+			var self = plus.webview.currentWebview();
+
+			for(var i = 0; i < viewsUrl.length; i++) {
+				var url = viewsUrl[i];
+				var view = plus.webview.create(url, url, subpage_style);
+				if(i > 0) {
+					view.hide();
+				}
+				self.append(view);
+
+				subViews.push({
+					id: url,
+					view: view
+				});
+			}
+		}
+
+		function initActionHandler() {
+			jQuery("[data-action]").each(function(i, ele) {
+				var $ele = jQuery(ele);
+				$ele.bind('tap', onTabClicked);
+			});
+		}
+
+		function onTabClicked() {
+			var $ele = jQuery(this);
+			var action = $ele.attr('data-action');
+			for(var i = 0; i < subViews.length; i++) {
+				var view = subViews[i];
+				if(view.id == action) {
+					plus.webview.show(view.view, "pop-in", 300);
+				} else {
+					plus.webview.hide(view.view);
+				}
+			}
+		}
+ 
+		function createWebsocketListener() {
+			plus.webview.create('websocketListener.html', 'WebsocketListener');
+		}
+	</script>
+
+</html>

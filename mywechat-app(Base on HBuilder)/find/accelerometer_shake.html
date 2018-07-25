@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<meta name="HandheldFriendly" content="true"/>
+		<meta name="MobileOptimized" content="320"/>
+		<title>Hello H5+</title>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<script src="../js/myapp.js"></script>
+		<script type="text/javascript">
+var p=null;
+var iLast=2,MAX=20;
+var up=null,down=null,offset=50;
+var t=null;
+window.MyPosition = null;
+// H5 plus事件处理
+function plusReady(){
+	//获得经纬度
+		plus.geolocation.getCurrentPosition( function ( p ) {
+		
+			window.MyPosition = String(p.coords.latitude)+"-"
+								+String(p.coords.longitude);
+	
+		}, function ( e ) {
+		alert( "Geolocation error: " + e.message );
+		} );		
+		
+	
+	
+	
+	
+	
+	// 锁定只能竖屏显示
+	plus.screen.lockOrientation('portrait-primary');
+	// 监听加速度
+	plus.accelerometer.watchAcceleration(function(a){
+		if(!up){
+			return;
+		}
+		if(!p && ( Math.abs(a.xAxis)+Math.abs(a.yAxis)+Math.abs(a.zAxis) > MAX )){
+			
+			
+			// Play audio
+			//播放音乐
+			p = plus.audio.createPlayer('_www/audio/shake.wav');
+			p.play();
+			setTimeout(function(){
+				// Change background image
+				//随即换壁纸
+				var index = Math.round(Math.random()*3+1);
+				if ( iLast == index ) {
+					index++;
+					if ( index > 4 ) {
+						index = 1;
+					}
+				}
+				document.body.style.backgroundImage='url(../img/shake/'+index+'.jpg)';
+				iLast = index;
+				// Stop play audio
+				p.stop();
+				delete p;
+				p = null;
+			}, 2000 );
+			// 绘画
+			offset=up.offsetHeight/2;
+			up.style.webkitTransform = 'translateY(-'+offset+'px)';
+			up.style.msTransform = 'translateY(-'+offset+'px)';
+			down.style.webkitTransform = 'translateY('+offset+'px)';
+			down.style.msTransform = 'translateY('+offset+'px)';
+			if(t){
+				clearTimeout(t);
+			}
+			t = setTimeout(function(){
+				t = null;
+				up.style.webkitTransform = '';
+				up.style.msTransform = '';
+				down.style.webkitTransform = '';
+				down.style.msTransform = '';
+			}, 700 );
+			//
+			if(window.MyPosition != null){
+				shakeFriend();	
+			}
+			else{
+				alert("地理位置获取失败！");
+			}
+			
+		}
+	}, function(e){
+		//outSet('Watch failed: '+e.message);
+	}, {frequency:100});
+}
+if(window.plus){
+	plusReady();
+}else{
+	document.addEventListener('plusready', plusReady, false);
+}
+// 监听DOMContentLoaded事件
+document.addEventListener('DOMContentLoaded', function(){
+	up=document.getElementById('up');
+	down=document.getElementById('down');
+	offset=up.offsetHeight/2;
+},false);
+// 解锁并关闭
+var _back=window.back;
+function unlockback(){
+	plus.screen.unlockOrientation();
+	_back();
+}
+window.back=unlockback;
+
+function refreshContact(){
+//			mui.openWindow({
+//				id: 'find/index.html',
+//				url: 'index.html',
+//			
+//			
+//			
+			
+			plus.webview.show("index.html");
+
+			//有的系统自带有延时显示页面
+			//隐藏当前页面时先等显示完成后再隐藏
+			setTimeout(
+				"plus.webview.close('accelerometer_shake.html')",
+				300
+			);
+	
+			
+		}
+
+	// ajax请求加好友 
+	function shakeFriend(){
+
+		//获得自己
+		curUser = getCurUser();
+		ajax('shakeFriend', {userId: curUser.id,positions: window.MyPosition}, {
+			success: function(data) {
+				if(data.code == 0) {
+					var friend = data.result;
+					console.log(friend[0].userId);
+					
+					//成功后添加好友
+					ajax('addFriend', {
+						selfId: curUser.id,
+						friendId: friend[0].userId
+					}, {
+						success: function(data) {
+							if(data.code == 0) {
+								mui.toast('你已将' + data.result.nickName + '加为好友');
+								//转到通讯录
+								//refreshContact();
+								
+							} else {
+								mui.alert(data.message);
+								//refreshContact();
+							}
+						}
+					});					
+					
+					
+					
+					
+					
+//					//mui.toast('你已将' + data.result.nickName + '加为好友');
+//					//loadMyFriends();
+				}
+				else {
+					
+					mui.alert(data.message);
+				}
+			}
+		});		
+		
+	}
+	
+
+
+		</script>		
+		<link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8"/>
+	</head>
+	<body style="background: center center no-repeat url(../img/shake/1.jpg);">
+		<header id="header">
+			<div class="nvbt iback" onclick="refreshContact()"></div>
+			<div class="nvtt">摇一摇</div>
+		</header>
+		<div style="height:100%;text-align:center;overflow:hidden;">
+			<div id="up" style="width:100%;height:50%;background:#333;-webkit-transition:all .5s ease-in-out;-ms-transition:all .5s ease-in-out;">
+				<img style="height:100%;" src="../img/shakeup.png"/>
+			</div>
+			<div id="down" style="padding-bottom:20px;width:100%;height:50%;background:#333;-webkit-transition:all .5s ease-in-out;-ms-transition:all .5s ease-in-out;">
+				<img style="height:100%;" src="../img/shakedown.png"/>
+			</div>
+		</div>
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="../js/immersed.js" ></script>
+</html>

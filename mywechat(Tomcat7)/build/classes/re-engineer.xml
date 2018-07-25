@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <!--数据库驱动程序-->
+    <driver>com.mysql.jdbc.Driver</driver>
+    <!--数据库URL-->
+    <url>jdbc:mysql://localhost:3306/mywechat</url>
+    <!--数据库登录名-->
+    <userName>root</userName>
+    <!--数据库登录密码-->
+    <password>1234</password>
+
+    <!--要处理数据库表/视图名的匹配模式, 如: D%, 留空则生成所有表/视图-->
+    <tableNamePattern></tableNamePattern>
+
+    <!--包的物理存放文件夹路径, 留空则根据packageName确定-->
+    <packagePath>D:\Workspaces\workspace_javaEE_oxygen\mywechat\src</packagePath>
+    <!--包名-->
+    <packageName>mywechat.vo.auto</packageName>
+    <!--类名前缀-->
+    <prefix>VO_</prefix>
+    <!--类名后缀-->
+    <suffix></suffix>
+</configuration>

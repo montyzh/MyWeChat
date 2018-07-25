@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<style>
+			.icon {
+				float: left;
+				width: 50px;
+				height: 50px;
+				margin-right: 20px;
+			}
+			
+			.session-item {
+				float: left;
+			}
+			
+			.session-item .userName {
+				line-height: 30px;
+				font-size: 16px;
+				color: black;
+			}
+			.session-item .msg-content {
+				line-height: 20px;
+				font-size: 12px;
+				color: #AAAAAA;
+				max-width:200px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">微信</h1>
+		</header>
+		<div class="mui-content">
+			<div id="pullrefresh" class="mui-content">
+				<div class="mui-scroll">
+					<ul id="session-list" class="mui-table-view mui-table-view-chevron">
+					</ul>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/jquery-1.10.2.min.js"></script>
+	<script src="../js/myapp.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		var curUser;
+		var $sessionList;
+		
+		mui.init({
+			pullRefresh: {
+				container: "#pullrefresh",
+				down: {
+					style: 'circle',
+					callback: loadLastSessionMessage
+				}
+			}
+		});
+
+		mui.plusReady(function() {
+			
+			window.addEventListener('REFRESH_LIST', onRequireRefresh);
+			window.addEventListener('WEBSOCKET_DATA_ARRIVED', onWebsocketDataArrived);
+			
+			curUser = getCurUser();
+			
+			$sessionList = jQuery("#session-list");
+			
+			loadLastSessionMessage();
+		}); 
+
+		function loadLastSessionMessage() {
+			ajax('getLastSessionMessage', {
+				selfId: curUser.id
+			}, {
+				success: function(data) {
+					var messages = data.result;
+					buildMessageList(messages);
+				},
+				complete : function(){
+					mui('#pullrefresh').pullRefresh().endPulldown();
+				}
+			});
+		}
+
+		function buildMessageList(messages) {
+			$sessionList.empty();
+			for(var i = 0; i < messages.length; i++) {
+				buildOneMessage(messages[i]);
+			}
+		}
+
+		var templete = '<img class="icon" src="" data-field="portrait"/><div class="session-item"><p class="userName" data-field="nickName"></p><p class="msg-content mui-ellipsis" data-field="msgContent"></p></div>';
+
+		function buildOneMessage(message) {
+			var friend = (message.toSender.id == curUser.id)?message.toReceiver:message.toSender;
+			
+			var li = jQuery("<li>");
+			li.addClass("mui-table-view-cell ");
+			li.html(templete);
+			li.find("[data-field]").each(function(i, ele) {
+				var $ele = jQuery(ele);
+				var dataField = $ele.attr("data-field");
+				switch(dataField) {
+					case 'nickName':
+						$ele.text(friend.nickName);
+						break;
+					case 'portrait':
+						$ele.attr("src", toServerUrl(friend.portrait));
+						break;
+					case 'msgContent':
+						$ele.text(message.msgContent);
+						break;
+				}
+			});
+
+			li.bind('tap', function() {
+				onSessionSelected(friend);
+			});
+			
+			$sessionList.append(li);
+		}
+
+		function onSessionSelected(friend) {
+			mui.openWindow({
+				id: '/chat/chat.html',
+				url: '../chat/chat.html',
+				extras: {
+					"friend": friend
+				}
+			});
+		}
+		
+		function onRequireRefresh() {
+			loadLastSessionMessage();
+		}
+		
+		// 接收到websocket消息
+		function onWebsocketDataArrived(e) {
+			loadLastSessionMessage();
+		}
+	</script>
+
+</html>

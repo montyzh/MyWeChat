@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    
+    <link href="../css/mui.min.css" rel="stylesheet"/>
+    <style>
+    	.icon { float:left;
+    		width: 30px;
+    		height: 30px;
+    	}
+    	.serverName {
+    		float: left;
+    		line-height: 30px;
+    		margin-left: 20px;
+    		font-size: 16px;
+    		color: black;
+    	}
+    </style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<h1 class="mui-title">发现</h1>
+		<a class="mui-icon mui-icon-personadd mui-pull-right" href="javascript:shakeAdd()"></a>
+	</header>
+	<div class="mui-content">
+		<div id="pullrefresh"  class="mui-content">
+			<div class="mui-scroll">
+				<ul id="server-list" class="mui-table-view mui-table-view-chevron">
+					<a class="mui-navigate-right" href="javascript:loadFriendHtml()">
+						<li class="mui-table-view-cell"> 
+							<img class="icon" src="../img/pyq.png"/>
+							<p class="serverName">朋友圈</p>
+						</li>
+					</a>
+				</ul>			
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../js/mui.min.js"></script>
+<script src="../js/jquery-1.10.2.min.js"></script>
+<script src="../js/myapp.js"></script>
+<script type="text/javascript" charset="utf-8">
+	
+  	mui.init();
+  	
+  	mui.plusReady(function(){
+  	
+  	});
+  	
+  	function loadFriendHtml(){
+  			//创建页面
+  			plus.webview.create("/find/friendloop/friendship.html","friendship.html");
+			//显示朋友圈页面
+			plus.webview.show("friendship.html");
+			//隐藏其它的页面
+			plus.webview.hide("index.html");
+
+  		
+  	}
+  	
+  	//摇一摇加好友
+  	function shakeAdd(){
+  		  	//创建页面
+  			plus.webview.create("/find/accelerometer_shake.html","accelerometer_shake.html");
+			//显示朋友圈页面
+			plus.webview.show("accelerometer_shake.html");
+			//隐藏其它的页面
+			plus.webview.hide("index.html");
+
+  		
+  	}
+</script>
+</html>

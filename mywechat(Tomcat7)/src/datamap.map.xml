@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/3.0/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/3.0/modelMap http://cayenne.apache.org/schema/3.0/modelMap.xsd"
+	 project-version="6">
+	<property name="defaultPackage" value="mywechat.store"/>
+	<db-entity name="add_friend_temp" catalog="mywechat">
+		<db-attribute name="Id" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+		<db-attribute name="position" type="VARCHAR" length="255"/>
+		<db-attribute name="time" type="VARCHAR" length="255"/>
+		<db-attribute name="user_id" type="INTEGER" length="10"/>
+	</db-entity>
+	<db-entity name="circle" catalog="mywechat">
+		<db-attribute name="Id" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+		<db-attribute name="image" type="VARCHAR" length="255"/>
+		<db-attribute name="like" type="VARCHAR" length="255"/>
+		<db-attribute name="position" type="VARCHAR" length="255"/>
+		<db-attribute name="text" type="VARCHAR" length="255"/>
+		<db-attribute name="time" type="VARCHAR" length="255"/>
+		<db-attribute name="user_id" type="INTEGER" length="10"/>
+	</db-entity>
+	<db-entity name="friends" catalog="mywechat">
+		<db-attribute name="id" type="INTEGER" isPrimaryKey="true" isGenerated="true" isMandatory="true" length="10"/>
+		<db-attribute name="user_id_a" type="INTEGER" isMandatory="true" length="10"/>
+		<db-attribute name="user_id_b" type="INTEGER" isMandatory="true" length="10"/>
+	</db-entity>
+	<db-entity name="messages" catalog="mywechat">
+		<db-attribute name="id" type="INTEGER" isPrimaryKey="true" isGenerated="true" isMandatory="true" length="10"/>
+		<db-attribute name="msg_content" type="LONGVARCHAR" isMandatory="true"/>
+		<db-attribute name="msg_type" type="VARCHAR" isMandatory="true" length="64"/>
+		<db-attribute name="receiver_id" type="INTEGER" isMandatory="true" length="10"/>
+		<db-attribute name="send_time" type="TIMESTAMP" isMandatory="true" length="19"/>
+		<db-attribute name="sender_id" type="INTEGER" isMandatory="true" length="10"/>
+	</db-entity>
+	<db-entity name="rely" catalog="mywechat">
+		<db-attribute name="Id" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+		<db-attribute name="circle_id" type="INTEGER" length="10"/>
+		<db-attribute name="content" type="VARCHAR" length="255"/>
+		<db-attribute name="nick" type="VARCHAR" length="255"/>
+	</db-entity>
+	<db-entity name="users" catalog="mywechat">
+		<db-attribute name="cell_phone" type="VARCHAR" isMandatory="true" length="32"/>
+		<db-attribute name="id" type="INTEGER" isPrimaryKey="true" isGenerated="true" isMandatory="true" length="10"/>
+		<db-attribute name="nick_name" type="VARCHAR" length="64"/>
+		<db-attribute name="password" type="VARCHAR" isMandatory="true" length="64"/>
+		<db-attribute name="portrait" type="VARCHAR" length="64"/>
+	</db-entity>
+	<db-entity name="v_last_session_message" catalog="mywechat">
+		<db-attribute name="id" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+		<db-attribute name="msg_content" type="LONGVARCHAR"/>
+		<db-attribute name="msg_type" type="VARCHAR" length="64"/>
+		<db-attribute name="receiver_id" type="INTEGER" length="10"/>
+		<db-attribute name="send_time" type="TIMESTAMP" length="19"/>
+		<db-attribute name="sender_id" type="INTEGER" length="10"/>
+	</db-entity>
+	<obj-entity name="AddFriendTemp" className="mywechat.store.AddFriendTemp" dbEntityName="add_friend_temp">
+		<obj-attribute name="id" type="int" db-attribute-path="Id"/>
+		<obj-attribute name="position" type="java.lang.String" db-attribute-path="position"/>
+		<obj-attribute name="time" type="java.lang.String" db-attribute-path="time"/>
+		<obj-attribute name="userId" type="java.lang.Integer" db-attribute-path="user_id"/>
+	</obj-entity>
+	<obj-entity name="Circle" className="mywechat.store.Circle" dbEntityName="circle">
+		<obj-attribute name="id" type="int" db-attribute-path="Id"/>
+		<obj-attribute name="image" type="java.lang.String" db-attribute-path="image"/>
+		<obj-attribute name="like" type="java.lang.String" db-attribute-path="like"/>
+		<obj-attribute name="position" type="java.lang.String" db-attribute-path="position"/>
+		<obj-attribute name="text" type="java.lang.String" db-attribute-path="text"/>
+		<obj-attribute name="time" type="java.lang.String" db-attribute-path="time"/>
+		<obj-attribute name="userId" type="java.lang.Integer" db-attribute-path="user_id"/>
+	</obj-entity>
+	<obj-entity name="Friends" className="mywechat.store.Friends" dbEntityName="friends">
+		<obj-attribute name="id" type="int" db-attribute-path="id"/>
+	</obj-entity>
+	<obj-entity name="Messages" className="mywechat.store.Messages" dbEntityName="messages">
+		<obj-attribute name="id" type="int" db-attribute-path="id"/>
+		<obj-attribute name="msgContent" type="java.lang.String" db-attribute-path="msg_content"/>
+		<obj-attribute name="msgType" type="java.lang.String" db-attribute-path="msg_type"/>
+		<obj-attribute name="sendTime" type="java.util.Date" db-attribute-path="send_time"/>
+	</obj-entity>
+	<obj-entity name="Rely" className="mywechat.store.Rely" dbEntityName="rely">
+		<obj-attribute name="circleId" type="java.lang.Integer" db-attribute-path="circle_id"/>
+		<obj-attribute name="content" type="java.lang.String" db-attribute-path="content"/>
+		<obj-attribute name="id" type="int" db-attribute-path="Id"/>
+		<obj-attribute name="nick" type="java.lang.String" db-attribute-path="nick"/>
+	</obj-entity>
+	<obj-entity name="Users" className="mywechat.store.Users" dbEntityName="users">
+		<obj-attribute name="cellPhone" type="java.lang.String" db-attribute-path="cell_phone"/>
+		<obj-attribute name="id" type="int" db-attribute-path="id"/>
+		<obj-attribute name="nickName" type="java.lang.String" db-attribute-path="nick_name"/>
+		<obj-attribute name="password" type="java.lang.String" db-attribute-path="password"/>
+		<obj-attribute name="portrait" type="java.lang.String" db-attribute-path="portrait"/>
+	</obj-entity>
+	<obj-entity name="VLastSessionMessage" className="mywechat.store.VLastSessionMessage" dbEntityName="v_last_session_message">
+		<obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
+		<obj-attribute name="msgContent" type="java.lang.String" db-attribute-path="msg_content"/>
+		<obj-attribute name="msgType" type="java.lang.String" db-attribute-path="msg_type"/>
+		<obj-attribute name="receiverId" type="java.lang.Integer" db-attribute-path="receiver_id"/>
+		<obj-attribute name="sendTime" type="java.util.Date" db-attribute-path="send_time"/>
+		<obj-attribute name="senderId" type="java.lang.Integer" db-attribute-path="sender_id"/>
+	</obj-entity>
+	<db-relationship name="toFriend" source="friends" target="users" toMany="false">
+		<db-attribute-pair source="user_id_b" target="id"/>
+	</db-relationship>
+	<db-relationship name="toMySelf" source="friends" target="users" toMany="false">
+		<db-attribute-pair source="user_id_a" target="id"/>
+	</db-relationship>
+	<db-relationship name="toReceiver" source="messages" target="users" toMany="false">
+		<db-attribute-pair source="receiver_id" target="id"/>
+	</db-relationship>
+	<db-relationship name="toSender" source="messages" target="users" toMany="false">
+		<db-attribute-pair source="sender_id" target="id"/>
+	</db-relationship>
+	<db-relationship name="asFriendsArray" source="users" target="friends" toMany="true">
+		<db-attribute-pair source="id" target="user_id_b"/>
+	</db-relationship>
+	<db-relationship name="messagesArray" source="users" target="messages" toMany="true">
+		<db-attribute-pair source="id" target="sender_id"/>
+	</db-relationship>
+	<db-relationship name="messagesArray1" source="users" target="messages" toMany="true">
+		<db-attribute-pair source="id" target="receiver_id"/>
+	</db-relationship>
+	<db-relationship name="myFriendsArray" source="users" target="friends" toMany="true">
+		<db-attribute-pair source="id" target="user_id_a"/>
+	</db-relationship>
+	<obj-relationship name="toFriend" source="Friends" target="Users" deleteRule="Nullify" db-relationship-path="toFriend"/>
+	<obj-relationship name="toMySelf" source="Friends" target="Users" deleteRule="Nullify" db-relationship-path="toMySelf"/>
+	<obj-relationship name="toReceiver" source="Messages" target="Users" deleteRule="Nullify" db-relationship-path="toReceiver"/>
+	<obj-relationship name="toSender" source="Messages" target="Users" deleteRule="Nullify" db-relationship-path="toSender"/>
+	<obj-relationship name="asFriendsArray" source="Users" target="Friends" deleteRule="Deny" db-relationship-path="asFriendsArray"/>
+	<obj-relationship name="messagesArray" source="Users" target="Messages" deleteRule="Deny" db-relationship-path="messagesArray"/>
+	<obj-relationship name="messagesArray1" source="Users" target="Messages" deleteRule="Deny" db-relationship-path="messagesArray1"/>
+	<obj-relationship name="myFriendsArray" source="Users" target="Friends" deleteRule="Deny" db-relationship-path="myFriendsArray"/>
+</data-map>

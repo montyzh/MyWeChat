@@ -1,0 +1,46 @@
+{
+	"index.html": {
+		"refer": [
+			"chat/index.html",
+			"me/index.html",
+			"find/index.html",
+			"contact/index.html",
+			"websocketListener.html"
+		],
+		"resources": [
+			"chat/index.html"
+		]
+	},
+	"login.html": {
+		"refer": [
+			"index.html",
+			"reg.html"
+		]
+	},
+	"contact/index.html": {
+		"refer": [
+			"chat/chat.html"
+		]
+	},
+	"chat/index.html": {
+		"refer": [
+			"chat/chat.html"
+		]
+	},
+	"chat/chat.html": {
+		"refer": [
+			"plugin/cropper/cropper.html"
+		]
+	},
+	"find/index.html": {
+		"refer": [
+			"find/friendloop/friendship.html",
+			"find/accelerometer_shake.html"
+		]
+	},
+	"find/friendloop/friendship.html": {
+		"refer": [
+			"find/friendloop/feedback.html"
+		]
+	}
+}

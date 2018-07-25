@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<!--基于第3方 https://github.com/fengyuanchen/cropper 实现-->
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>编辑图片</title>
+		<link rel="stylesheet" href="../../css/mui.min.css" />
+		<link rel="stylesheet" href="./cropper.min.css?" />
+		<link rel="stylesheet" href="../../css/iconfont.css" />
+
+		<style>
+			html,
+			body {
+				background-color: #000000;
+			}
+			
+			.mui-bar-nav {
+				background-color: #000000;
+				box-shadow: 0 1px 3px #0A0A0A;
+				-webkit-box-shadow: 0 1px 3px #0A0A0A;
+			}
+			
+			.mui-title,
+			.mui-icon {
+				color: #AAAAAA;
+			}
+			
+			.mui-content {
+				background-color: #000000;
+			}
+			
+			.img-content {
+				width: 100%;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				-webkit-transform: translate(-50%, -50%);
+				-moz-transform: translate(-50%, -50%);
+				-ms-transform: translate(-50%, -50%);
+				-o-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+				text-align: center;
+			}
+			
+			.mui-bar-tab {
+				background-color: #0A0A0A;
+			}
+			
+			.mui-bar-tab .mui-tab-item.mui-active {
+				color: #929292;
+			}
+			
+			#image {
+				max-width: 100%;
+				max-height: 500px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div class="img-content">
+				<img id="image" src="../../images/ic_no_picture.png" />
+			</div>
+		</div>
+
+		<!--编辑工具栏-->
+		<div class="mui-bar mui-bar-tab">
+			<a id="btnCancel" href="#cancel" class="mui-tab-item">
+				<span class="mui-icon mui-icon-undo"></span>
+			</a>
+			<a href="#rotate-right" class="mui-tab-item">
+				<span class="mui-icon  iconfont icon-rotate-right"></span>
+			</a>
+			<a href="#rotate-left" class="mui-tab-item">
+				<span class="mui-icon iconfont icon-rotate-left"></span>
+			</a>
+			<a href="#rotate-right-90" class="mui-tab-item">
+				<span class="mui-icon iconfont icon-rotate-right-90d"></span>
+			</a>
+			<a href="#confirm" class="mui-tab-item">
+				<span class="mui-icon iconfont icon-confirm-1"></span>
+			</a>
+		</div>
+	</body>
+
+	<script type="text/javascript" src="../../js/mui.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+	<!--cropper依赖 jQuery-->
+	<script type="text/javascript" src="../../js/jquery-1.10.2.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+
+	<script type="text/javascript" src="./cropper.min.js?t=94e6a5aa801243e1a0ad68523053645b"></script>
+
+	<script type="text/javascript">
+		var $image;
+		var rotate = 0;
+		var model;
+
+		mui.init();
+
+		mui.plusReady(function() {
+			$image = jQuery("#image");
+
+			window.addEventListener("loadData", loadData);
+
+			window.addEventListener("show", function() {
+				jQuery("#image").attr("src", "../../images/ic_no_picture.png");
+			})
+
+			mui(".mui-bar-tab").on("tap", "a", function() {
+				switch(jQuery(this).attr("href")) {
+					case "#cancel":
+						cancelEdit();
+						break;
+					case "#rotate-right":
+						$image.cropper('rotateTo', ++rotate);
+						break;
+					case "#rotate-left":
+						$image.cropper('rotateTo', --rotate);
+						break;
+					case "#rotate-right-90":
+						rotate += 90;
+						$image.cropper('rotateTo', rotate);
+						break;
+					case "#confirm":
+						confirmEdit(); // 确认编辑
+						break;
+				}
+			});
+		});
+
+		// 加载图片数据, 由主图片调用, 传入数据
+		function loadData(event) {
+			model = jQuery.extend({}, event.detail);
+
+			$image.attr("src", model.picture.data);
+
+			// 开始编辑
+			$image.cropper({
+				autoCropArea: 1
+			});
+		}
+
+		// 取消编辑
+		function cancelEdit() {
+			$image.cropper('destroy');
+			mui.back();
+		}
+
+		// 确认编辑
+		function confirmEdit() {
+			var dataURL = $image.cropper("getCroppedCanvas");
+			var imgurl = dataURL.toDataURL("image/jpeg", 0.8);
+			$image.cropper('destroy');
+
+			if(!(model.openerId && model.cbFunctionName)) mui.back();
+
+			var opener = plus.webview.getWebviewById(model.openerId);
+
+			if(opener) {
+				mui.fire(opener, model.cbFunctionName, {
+					pictures: [{
+						data: imgurl
+					}],
+					source: model.source
+				});
+			}
+			mui.back();
+		}
+	</script>
+
+</html>
